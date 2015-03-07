@@ -12,21 +12,24 @@ COMPANY_ID = 2782
 
 
 def api_call(url, params, method):
+    params = json.loads(json.dumps(params)) #converts python objects to javascript like objects
     params['timestamp'] = calendar.timegm(datetime.utcnow().utctimetuple())
     params['access_token'] = BRINGG_ACCESS_TOKEN
     params['signature'] = hmac.new(BRINGG_SECRET_KEY, msg=urllib.urlencode(params), digestmod=hashlib.sha1).hexdigest()
-    print params
-    print params['signature']
 
     if method.lower() == "post":
+        f_method = "post"
         r = requests.post(url, params=params)
     elif method.lower() == "get":
+        f_method = "get"
         r = requests.get(url, params=params)
     elif method.lower() == "patch":
+        f_method = "patch"
         r = requests.patch(url, params=params)
     elif method.lower() == "delete":
+        f_method = "delete"
         r = requests.delete(url, params=params)
-    return {'status': r.status_code, 'response': r.text, 'request_url': r.url, 'method': method}
+    return {'status': r.status_code, 'response': r.text, 'request_url': r.url, 'method': f_method}
 
 
 def create_user(company_id, name, email, password, phone, admin=False):
